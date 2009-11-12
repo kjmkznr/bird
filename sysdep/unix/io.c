@@ -17,6 +17,7 @@
 #include <sys/un.h>
 #include <unistd.h>
 #include <errno.h>
+#include <net/if.h>
 
 #include "nest/bird.h"
 #include "lib/lists.h"
@@ -911,6 +912,21 @@ sk_open(sock *s)
       break;
       }
     }
+#ifdef IPV6
+    /* Use link local address */
+    if(s->iface){
+        struct ifa *a;
+        WALK_LIST(a, s->iface->addrs)
+        if(a->scope == SCOPE_LINK)
+        {
+            struct ifreq ifr;
+            log(L_TRACE "Using Interface %s", s->iface->name);
+            strcpy(ifr.ifr_name, s->iface->name);
+            if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, &ifr, sizeof(ifr)) < 0)
+                ERR("SO_BINDTODEVICE");
+        }
+    }
+#endif /* IPV6 */
   if (has_src)
     {
       int port;

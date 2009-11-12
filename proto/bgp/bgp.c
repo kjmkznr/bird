@@ -536,6 +536,10 @@ bgp_connect(struct bgp_proto *p)	/* Enter Connect state and start establishing c
   s->tos = IP_PREC_INTERNET_CONTROL;
   s->password = p->cf->password;
   s->tx_hook = bgp_connected;
+  if(p->cf->source_iface)
+      s->iface = if_find_by_name(p->cf->source_iface);
+  else
+      s->iface = p->neigh->iface;
   BGP_TRACE(D_EVENTS, "Connecting to %I from local address %I", s->daddr, s->saddr);
   bgp_setup_conn(p, conn);
   bgp_setup_sk(p, conn, s);

@@ -115,7 +115,7 @@ neigh_find(struct proto *p, ip_addr *a, unsigned flags)
   class = ipa_classify(*a);
   if (class < 0)			/* Invalid address */
     return NULL;
-  if ((class & IADDR_SCOPE_MASK) < SCOPE_SITE ||
+  if ((class & IADDR_SCOPE_MASK) < SCOPE_LINK ||
       !(class & IADDR_HOST))
     return NULL;			/* Bad scope or a somecast */
 
